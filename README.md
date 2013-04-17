@@ -18,4 +18,4 @@ numerals as defined by the International Morse Code:
 * 7: `--...`
 * 8: `---..`
 * 9: `----.`
-* 0: `----0`
+* 0: `-----`
