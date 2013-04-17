@@ -7,6 +7,7 @@
 #define MY_UUID { 0x99, 0x75, 0x7F, 0x7D, 0x51, 0x93, 0x45, 0xDB, 0xA1, 0x68, 0x16, 0x8F, 0xBB, 0x6F, 0x2C, 0x65 }
 PBL_APP_INFO(MY_UUID, "Morseful", "kourge", 0x1, 0x0, INVALID_RESOURCE, APP_INFO_WATCH_FACE);
 
+#define LENGTH_OF(x) (sizeof(x) / sizeof(x[0]))
 
 Window window;
 TextLayer timeLayer;
@@ -30,7 +31,7 @@ void handle_second_tick(AppContextRef ctx, PebbleTickEvent *t) {
   text_layer_set_text(&timeLayer, timeText);
 
   if (currentTime.tm_sec == 0 && currentTime.tm_min % 5 == 0) {
-    vibes_double_pulse();
+    morse_pulse_time(timeText);
   }
 }
 
@@ -39,6 +40,14 @@ void morse_pulse_time(char *time_string) {
   VibePattern pattern = { .num_segments = 39, .durations = sequence };
   vibes_enqueue_custom_pattern(pattern);
 }
+
+#define WRITE_MORSE(symbol, index, dest) \
+  do { \
+    for (unsigned int k = 0; k < LENGTH_OF(MORSE_OF(symbol)); k++) { \
+      dest[index++] = MORSE_OF(symbol)[k]; \
+      dest[index++] = IGAP; \
+    } \
+  } while (0)
 
 void morse_format_time(char *time_string, uint32_t *durations) {
   int i = 0;
@@ -49,9 +58,19 @@ void morse_format_time(char *time_string, uint32_t *durations) {
     char digit = time_string[position];
 
     switch (digit) {
-    case '0':
-      break;
+    case '0': WRITE_MORSE(0, i, durations); break;
+    case '1': WRITE_MORSE(1, i, durations); break;
+    case '2': WRITE_MORSE(2, i, durations); break;
+    case '3': WRITE_MORSE(3, i, durations); break;
+    case '4': WRITE_MORSE(4, i, durations); break;
+    case '5': WRITE_MORSE(5, i, durations); break;
+    case '6': WRITE_MORSE(6, i, durations); break;
+    case '7': WRITE_MORSE(7, i, durations); break;
+    case '8': WRITE_MORSE(8, i, durations); break;
+    case '9': WRITE_MORSE(9, i, durations); break;
     }
+
+    durations[i - 1] = SGAP;
   }
 }
 
