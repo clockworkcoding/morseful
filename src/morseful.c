@@ -14,8 +14,8 @@ TextLayer timeLayer;
 uint32_t sequence[40];
 
 void handle_second_tick(AppContextRef ctx, PebbleTickEvent *t);
-void morse_pulse_time(char *time_string);
-void morse_format_time(char *time_string, uint32_t *durations);
+void morse_pulse_time(char *timeText);
+void morse_format_string(char *string, size_t length, uint32_t *durations);
 void handle_init_app(AppContextRef app_ctx);
 void pbl_main(void *params);
 
@@ -35,9 +35,10 @@ void handle_second_tick(AppContextRef ctx, PebbleTickEvent *t) {
   }
 }
 
-void morse_pulse_time(char *time_string) {
+void morse_pulse_time(char *timeText) {
   static VibePattern pattern = { .num_segments = 39, .durations = sequence };
-  morse_format_time(time_string, sequence);
+  char string[] = { timeText[0], timeText[1], timeText[3], timeText[4] };
+  morse_format_string(string, 4, sequence);
   vibes_enqueue_custom_pattern(pattern);
 }
 
@@ -49,15 +50,13 @@ void morse_pulse_time(char *time_string) {
     } \
   } while (0)
 
-void morse_format_time(char *time_string, uint32_t *durations) {
+void morse_format_string(char *string, size_t length, uint32_t *durations) {
   int i = 0;
 
-  static int positions[] = { 0, 1, 3, 4 };
-  for (int j = 0; j < 4; j++) {
-    int position = positions[j];
-    char digit = time_string[position];
+  for (size_t j = 0; j < length; j++) {
+    char c = string[j];
 
-    switch (digit) {
+    switch (c) {
     case '0': WRITE_MORSE(0, i, durations); break;
     case '1': WRITE_MORSE(1, i, durations); break;
     case '2': WRITE_MORSE(2, i, durations); break;
