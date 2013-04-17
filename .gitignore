@@ -24,3 +24,8 @@ resources/wscript
 tools
 waf
 wscript
+
+# Pebble built objects
+build/
+.waf*
+.lock-waf*
