@@ -36,8 +36,8 @@ void handle_second_tick(AppContextRef ctx, PebbleTickEvent *t) {
 }
 
 void morse_pulse_time(char *time_string) {
+  static VibePattern pattern = { .num_segments = 39, .durations = sequence };
   morse_format_time(time_string, sequence);
-  VibePattern pattern = { .num_segments = 39, .durations = sequence };
   vibes_enqueue_custom_pattern(pattern);
 }
 
