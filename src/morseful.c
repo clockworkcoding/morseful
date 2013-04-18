@@ -37,7 +37,7 @@ void handle_second_tick(AppContextRef ctx, PebbleTickEvent *t) {
 }
 
 inline bool should_pulse_now(PblTm *time) {
-  return time->tm_sec == 0;
+  return time->tm_sec == 0 && time->tm_min % 5 == 0;
 }
 
 void morse_pulse_time(char *timeText) {
