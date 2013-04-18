@@ -14,6 +14,7 @@ TextLayer timeLayer;
 uint32_t sequence[40];
 
 void handle_second_tick(AppContextRef ctx, PebbleTickEvent *t);
+bool should_pulse_now(PblTm *time);
 void morse_pulse_time(char *timeText);
 void morse_format_string(char *string, size_t length, uint32_t *durations);
 void handle_init_app(AppContextRef app_ctx);
@@ -30,9 +31,13 @@ void handle_second_tick(AppContextRef ctx, PebbleTickEvent *t) {
   string_format_time(timeText, sizeof(timeText), "%T", &currentTime);
   text_layer_set_text(&timeLayer, timeText);
 
-  if (currentTime.tm_sec == 0 && currentTime.tm_min % 5 == 0) {
+  if (should_pulse_now(&currentTime)) {
     morse_pulse_time(timeText);
   }
+}
+
+inline bool should_pulse_now(PblTm *time) {
+  return time->tm_sec == 0;
 }
 
 void morse_pulse_time(char *timeText) {

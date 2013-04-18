@@ -5,7 +5,7 @@
 #endif
 
 #ifndef MORSE_TICK
-#define MORSE_TICK 50
+#define MORSE_TICK 100
 #endif
 
 #define _ MORSE_TICK
