@@ -22,8 +22,6 @@
 #define DEFINE_MORSE(symbol, ...) uint32_t MORSE_##symbol[] = { __VA_ARGS__ }
 #define MORSE_OF(symbol) MORSE_##symbol
 
-#define LENGTH_OF(x) (sizeof(x) / sizeof(x[0]))
-
 DEFINE_MORSE(A, _, ___);
 DEFINE_MORSE(B, ___, _, _, _);
 DEFINE_MORSE(C, ___, _, ___, _);
@@ -66,7 +64,7 @@ void morse_format_string(char *string, size_t length, uint32_t *durations);
 
 #define WRITE_MORSE(symbol, index, dest) \
   do { \
-    for (unsigned int k = 0; k < LENGTH_OF(MORSE_OF(symbol)); k++) { \
+    for (unsigned int k = 0; k < ARRAY_LENGTH(MORSE_OF(symbol)); k++) { \
       dest[index++] = MORSE_OF(symbol)[k]; \
       dest[index++] = IGAP; \
     } \
