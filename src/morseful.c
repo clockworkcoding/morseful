@@ -28,7 +28,7 @@ void handle_second_tick(AppContextRef ctx, PebbleTickEvent *t) {
   PblTm currentTime;
 
   get_time(&currentTime);
-  string_format_time(timeText, sizeof(timeText), "%T", &currentTime);
+  string_format_time(timeText, sizeof(timeText), "%H\n%M\n%S", &currentTime);
   text_layer_set_text(&timeLayer, timeText);
 
   if (should_pulse_now(&currentTime)) {
@@ -83,10 +83,11 @@ void handle_init_app(AppContextRef app_ctx) {
   window_stack_push(&window, true);
   window_set_background_color(&window, GColorBlack);
 
-  text_layer_init(&timeLayer, GRect(29, 54, 144-40 /* width */, 168-54 /* height */));
+  text_layer_init(&timeLayer, GRect(0, 15, 144 /* width */, 168 /* height */));
   text_layer_set_text_color(&timeLayer, GColorWhite);
   text_layer_set_background_color(&timeLayer, GColorClear);
-  text_layer_set_font(&timeLayer, fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD));
+  text_layer_set_font(&timeLayer, fonts_get_system_font(FONT_KEY_GOTHAM_42_BOLD));
+  text_layer_set_text_alignment(&timeLayer, GTextAlignmentCenter);
 
   // Ensures time is displayed immediately (will break if NULL tick event accessed).
   // (This is why it's a good idea to have a separate routine to do the update itself.)
