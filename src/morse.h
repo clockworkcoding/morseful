@@ -1,7 +1,12 @@
 #pragma once
+#include "pebble_os.h"
 
 #ifdef _
 #define _OLD_UNDERSCORE _
+#endif
+
+#ifdef ___
+#define _OLD_TRIPLE_UNDERSCORE ___
 #endif
 
 #ifndef MORSE_TICK
@@ -16,6 +21,8 @@
 
 #define DEFINE_MORSE(symbol, ...) uint32_t MORSE_##symbol[] = { __VA_ARGS__ }
 #define MORSE_OF(symbol) MORSE_##symbol
+
+#define LENGTH_OF(x) (sizeof(x) / sizeof(x[0]))
 
 DEFINE_MORSE(A, _, ___);
 DEFINE_MORSE(B, ___, _, _, _);
@@ -55,8 +62,23 @@ DEFINE_MORSE(8, ___, ___, ___, _, _);
 DEFINE_MORSE(9, ___, ___, ___, ___, _);
 DEFINE_MORSE(0, ___, ___, ___, ___, ___);
 
-#ifdef _OLDER_UNDERSCORE
-#define _ _OLDER_UNDERSCORE
-#undef _OLDER_UNDERSCORE
+void morse_format_string(char *string, size_t length, uint32_t *durations);
+
+#define WRITE_MORSE(symbol, index, dest) \
+  do { \
+    for (unsigned int k = 0; k < LENGTH_OF(MORSE_OF(symbol)); k++) { \
+      dest[index++] = MORSE_OF(symbol)[k]; \
+      dest[index++] = IGAP; \
+    } \
+  } while (0)
+
+#ifdef _OLD_UNDERSCORE
+#define _ _OLD_UNDERSCORE
+#undef _OLD_UNDERSCORE
+#endif
+
+#ifdef _OLD_TRIPLE_UNDERSCORE
+#define ___ _OLD_TRIPLE_UNDERSCORE
+#undef _OLD_TRIPLE_UNDERSCORE ___
 #endif
 
