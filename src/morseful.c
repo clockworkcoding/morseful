@@ -1,10 +1,14 @@
 #include "pebble_os.h"
 #include "pebble_app.h"
 #include "pebble_fonts.h"
-
-// 99757F7D519345DBA168168FBB6F2C65
-#define MY_UUID { 0x99, 0x75, 0x7F, 0x7D, 0x51, 0x93, 0x45, 0xDB, 0xA1, 0x68, 0x16, 0x8F, 0xBB, 0x6F, 0x2C, 0x65 }
-PBL_APP_INFO(MY_UUID, "Morseful", "kourge", 0x1, 0x0, INVALID_RESOURCE, APP_INFO_WATCH_FACE);
+///////////////////////////////////////////////////////////////////////////////
+//Modification of Morseful by Kourge https://github.com/kourge/morseful	
+//App that allows a button press to signal the time in morse vibration rather than once every five minutes
+///////////////////////////////////////////////////////////////////////////////
+	
+// 99757F7D519345DBA168168FBB6F2C66
+#define MY_UUID { 0x99, 0x75, 0x7F, 0x7D, 0x51, 0x93, 0x45, 0xDB, 0xA1, 0x68, 0x16, 0x8F, 0xBB, 0x6F, 0x2C, 0x66 }
+PBL_APP_INFO(MY_UUID, "Morseful Button", "ClockworkCoding", 0x1, 0x0, INVALID_RESOURCE, APP_INFO_STANDARD_APP);
 
 void morse_format_string(char *string, size_t length, uint32_t *durations);
 
@@ -28,21 +32,33 @@ void handle_second_tick(AppContextRef ctx, PebbleTickEvent *t) {
   get_time(&currentTime);
   string_format_time(timeText, sizeof(timeText), "%H\n%M\n%S", &currentTime);
   text_layer_set_text(&timeLayer, timeText);
-
-  if (should_pulse_now(&currentTime)) {
-    morse_pulse_time(timeText);
-  }
 }
 
-inline bool should_pulse_now(PblTm *time) {
-  return time->tm_sec == 0 && time->tm_min % 5 == 0;
-}
 
 void morse_pulse_time(char *timeText) {
   static VibePattern pattern = { .num_segments = 39, .durations = sequence };
   char string[] = { timeText[0], timeText[1], timeText[3], timeText[4] };
   morse_format_string(string, 4, sequence);
   vibes_enqueue_custom_pattern(pattern);
+}
+
+void select_single_click_handler(ClickRecognizerRef recognizer, Window *window) {
+  (void)recognizer;
+  (void)window;
+  static char timeText[] = "00:00:00";
+  PblTm currentTime;
+
+  get_time(&currentTime);
+  string_format_time(timeText, sizeof(timeText), "%H\n%M\n%S", &currentTime);
+
+  morse_pulse_time(timeText);
+}
+
+
+void click_config_provider(ClickConfig **config, Window *window) {
+  (void)window;
+
+  config[BUTTON_ID_SELECT]->click.handler = (ClickHandler) select_single_click_handler;
 }
 
 void handle_init_app(AppContextRef app_ctx) {
@@ -61,8 +77,9 @@ void handle_init_app(AppContextRef app_ctx) {
   handle_second_tick(app_ctx, NULL);
 
   layer_add_child(&window.layer, &timeLayer.layer);
+  // Attach our desired button functionality
+  window_set_click_config_provider(&window, (ClickConfigProvider) click_config_provider);
 }
-
 
 void pbl_main(void *params) {
   PebbleAppHandlers handlers = {
